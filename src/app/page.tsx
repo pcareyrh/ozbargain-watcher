@@ -1,66 +1,84 @@
-import Image from "next/image";
+import { OZBARGAIN_CATEGORIES } from "@/lib/ozbargain/categories";
+import { getLastRun, getRecentAlerts, loadConfig } from "@/lib/store/snapshots";
+import { ConfigForm } from "./ConfigForm";
 import styles from "./page.module.css";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+function formatTime(ms: number | null): string {
+  if (!ms) return "Never";
+  return new Date(ms).toLocaleString();
+}
+
+export default async function Home() {
+  const [config, lastRun, recent] = await Promise.all([
+    loadConfig(),
+    getLastRun(),
+    getRecentAlerts(20),
+  ]);
+
   return (
     <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+      <header className={styles.header}>
+        <p className={styles.brand}>ozbargain-watcher</p>
+        <h1>Hot deal monitor</h1>
+        <p className={styles.lede}>
+          Alerts when a deal gains more than {config.voteDelta} upvotes in{" "}
+          {config.windowMinutes} minutes
+          {config.categoryAllowlist.length === 0
+            ? " across all categories"
+            : ` in ${config.categoryAllowlist.length} categories`}
+          .
+        </p>
+      </header>
+
+      <section className={styles.meta}>
+        <div>
+          <span className={styles.label}>Last run</span>
+          <strong>{formatTime(lastRun)}</strong>
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div>
+          <span className={styles.label}>Threshold</span>
+          <strong>
+            &gt;{config.voteDelta} / {config.windowMinutes}m
+          </strong>
         </div>
-      </main>
+        <div>
+          <span className={styles.label}>Cooldown</span>
+          <strong>{config.cooldownHours}h</strong>
+        </div>
+        <div>
+          <span className={styles.label}>Categories</span>
+          <strong>
+            {config.categoryAllowlist.length === 0
+              ? "All"
+              : config.categoryAllowlist.join(", ")}
+          </strong>
+        </div>
+      </section>
+
+      <ConfigForm initialConfig={config} categories={OZBARGAIN_CATEGORIES} />
+
+      <section className="card">
+        <h2>Recent alerts</h2>
+        {recent.length === 0 ? (
+          <p className="muted">No alerts yet. Run a watch cycle to populate.</p>
+        ) : (
+          <ul className={styles.alerts}>
+            {recent.map((alert) => (
+              <li key={`${alert.dealId}-${alert.alertedAt}`}>
+                <a href={alert.url} target="_blank" rel="noopener noreferrer">
+                  {alert.title}
+                </a>
+                <span className="muted">
+                  +{alert.deltaVotes} / {alert.windowMinutes}m ·{" "}
+                  {alert.votesPos}↑ · {formatTime(alert.alertedAt)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
   );
 }
