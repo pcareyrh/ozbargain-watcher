@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeShellExecution": [
+      {
+        "command": ".cursor/hooks/format-before-git-add.sh",
+        "matcher": "git\\s+add\\b",
+        "failClosed": true
+      },
+      {
+        "command": ".cursor/hooks/secret-scan.sh",
+        "matcher": "git\\s+(commit|push|add)\\b",
+        "failClosed": true
+      }
+    ]
+  }
+}
