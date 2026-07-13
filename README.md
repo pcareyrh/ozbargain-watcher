@@ -9,7 +9,7 @@ Default trigger: **more than 15 upvotes in 45 minutes** (configurable). Alerts g
 - Next.js (App Router) on Vercel
 - OzBargain RSS: `https://www.ozbargain.com.au/deals/feed`
 - Upstash Redis for vote history, cooldowns, and config overrides
-- Vercel Cron every 2 minutes (`vercel.json`)
+- Scheduled watch via **external cron** every 2 minutes (Hobby-friendly) + optional daily Vercel Cron backup
 
 ## Setup
 
@@ -39,15 +39,41 @@ Optional:
 
 Without Redis credentials, the app uses an **in-memory** store (fine for local single-process runs; not for multi-instance production).
 
-## Deploy on Vercel
+## Deploy on Vercel (Hobby + external cron)
+
+Vercel **Hobby** only allows Cron Jobs **once per day**, so frequent polling must come from an external scheduler. The app still exposes `GET /api/watch`; anything that can HTTP GET it on an interval works.
 
 1. Create an Upstash Redis database and connect it to the Vercel project (Marketplace).
-2. Set `CRON_SECRET` in project env vars (Vercel Cron sends it as `Authorization: Bearer …`).
-3. Deploy. Cron hits `GET /api/watch` every 2 minutes.
+2. Set `CRON_SECRET` in project env vars.
+3. Deploy and confirm the **Production** domain (not a protected preview URL).
+4. Disable Deployment Protection for Production, **or** create a Protection Bypass token for cron.
+5. Create an external cron job every **2 minutes** (e.g. [cron-job.org](https://cron-job.org), EasyCron, or GitHub Actions) that calls:
 
-**Hobby plan note:** Vercel Cron on Hobby is limited to once per day. For 2-minute polling on Hobby, point an external cron (e.g. cron-job.org) at:
+```bash
+curl -sS \
+  -H "Authorization: Bearer YOUR_CRON_SECRET" \
+  "https://YOUR_PRODUCTION_DOMAIN/api/watch"
+```
 
-`https://YOUR_APP.vercel.app/api/watch` with header `Authorization: Bearer CRON_SECRET`.
+If Deployment Protection stays on, also send:
+
+```bash
+-H "x-vercel-protection-bypass: YOUR_BYPASS_TOKEN"
+```
+
+### Optional daily Vercel Cron
+
+[`vercel.json`](vercel.json) schedules one Hobby-legal backup run at **09:00 UTC**:
+
+```json
+{ "crons": [{ "path": "/api/watch", "schedule": "0 9 * * *" }] }
+```
+
+This is a safety net only — use the external cron for real “hot deal” latency.
+
+### Pro plan
+
+On Vercel Pro you can switch the cron expression back to `*/2 * * * *` and drop the external scheduler if you prefer native Vercel Cron.
 
 ## Local watch loop
 
