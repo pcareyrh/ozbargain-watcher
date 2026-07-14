@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { OZBARGAIN_CATEGORIES } from "@/lib/ozbargain/categories"
 import { SubscribeForm } from "./SubscribeForm"
+import { TopicIndex } from "./TopicIndex"
 import styles from "./subscribe.module.css"
 
 export const dynamic = "force-dynamic"
@@ -21,6 +22,7 @@ export default function SubscribePage() {
       </header>
 
       <SubscribeForm categories={OZBARGAIN_CATEGORIES} />
+      <TopicIndex />
     </div>
   )
 }
