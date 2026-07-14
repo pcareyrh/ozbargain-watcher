@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server"
-import { createSubscription } from "@/lib/store/subscriptions"
+import { authorizeRequest } from "@/lib/auth"
+import {
+  createSubscription,
+  listAllSubscriptions,
+} from "@/lib/store/subscriptions"
 import { isCreateRateLimited } from "@/lib/subscriptions/rate-limit"
 import {
   buildManageUrl,
@@ -8,6 +12,22 @@ import {
 import { parseCategoryAllowlist } from "@/lib/subscriptions/validation"
 
 export const dynamic = "force-dynamic"
+
+export async function GET(request: Request) {
+  if (!authorizeRequest(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
+  const subscriptions = await listAllSubscriptions()
+
+  return NextResponse.json({
+    subscriptions: subscriptions.map((subscription) => ({
+      ...toPublicSubscription(subscription),
+      createdAt: subscription.createdAt,
+      updatedAt: subscription.updatedAt,
+    })),
+  })
+}
 
 export async function POST(request: Request) {
   if (isCreateRateLimited(request)) {

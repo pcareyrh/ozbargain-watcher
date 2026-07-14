@@ -130,18 +130,23 @@ export async function listAllSubscriptionIds(): Promise<string[]> {
   return ids ?? []
 }
 
-export async function listEnabledSubscriptions(): Promise<Subscription[]> {
+export async function listAllSubscriptions(): Promise<Subscription[]> {
   const ids = await listAllSubscriptionIds()
   const subscriptions: Subscription[] = []
 
   for (const id of ids) {
     const subscription = await getSubscription(id)
-    if (subscription?.enabled) {
+    if (subscription) {
       subscriptions.push(subscription)
     }
   }
 
-  return subscriptions
+  return subscriptions.sort((a, b) => b.createdAt - a.createdAt)
+}
+
+export async function listEnabledSubscriptions(): Promise<Subscription[]> {
+  const subscriptions = await listAllSubscriptions()
+  return subscriptions.filter((subscription) => subscription.enabled)
 }
 
 export async function updateSubscription(
