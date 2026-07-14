@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { OZBARGAIN_CATEGORIES } from "@/lib/ozbargain/categories";
 import { getLastRun, getRecentAlerts, loadConfig } from "@/lib/store/snapshots";
 import { ConfigForm } from "./ConfigForm";
@@ -29,6 +30,9 @@ export default async function Home() {
             ? " across all categories"
             : ` in ${config.categoryAllowlist.length} categories`}
           .
+        </p>
+        <p className={styles.lede}>
+          <Link href="/subscribe">Get alerts</Link>
         </p>
       </header>
 
