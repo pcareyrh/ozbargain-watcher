@@ -67,6 +67,37 @@
   color: #667;
 }
 
+.hotFeature {
+  border-color: #b7d7c8;
+  background: linear-gradient(180deg, #f3faf6 0%, var(--card, #fff) 55%);
+}
+
+.hotBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.hotTitle {
+  color: #0b6e4f;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-decoration: none;
+}
+
+.hotTitle:hover {
+  text-decoration: underline;
+}
+
+.hotMeta {
+  margin: 0;
+  color: #334;
+  font-weight: 550;
+  line-height: 1.4;
+}
+
+.dealList,
 .alerts {
   list-style: none;
   display: flex;
@@ -74,6 +105,7 @@
   gap: 0.85rem;
 }
 
+.dealList li,
 .alerts li {
   display: flex;
   flex-direction: column;
@@ -82,11 +114,19 @@
   border-bottom: 1px solid #e5ebe7;
 }
 
+.dealList li:last-child,
+.alerts li:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.dealList a,
 .alerts a {
   color: #0b6e4f;
   font-weight: 600;
 }
 
+.dealList a:hover,
 .alerts a:hover {
   text-decoration: underline;
 }
@@ -110,11 +150,23 @@
     border-color: #24332c;
   }
 
-  .alerts li {
-    border-bottom-color: #24332c;
+  .hotFeature {
+    border-color: #2a4539;
+    background: linear-gradient(180deg, #13201a 0%, var(--card, #0f1412) 55%);
   }
 
+  .hotTitle,
+  .dealList a,
   .alerts a {
     color: #5dcea6;
+  }
+
+  .hotMeta {
+    color: #c8d5ce;
+  }
+
+  .dealList li,
+  .alerts li {
+    border-bottom-color: #24332c;
   }
 }
