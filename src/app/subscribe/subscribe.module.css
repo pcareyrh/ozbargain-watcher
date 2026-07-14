@@ -1,0 +1,176 @@
+.page {
+  width: min(920px, 100%);
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.brand {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
+  color: #0b6e4f;
+}
+
+.header h1 {
+  font-size: clamp(1.75rem, 4vw, 2.4rem);
+  line-height: 1.15;
+  font-weight: 650;
+}
+
+.lede {
+  color: #445;
+  max-width: 42rem;
+  line-height: 1.5;
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  align-items: center;
+}
+
+.nav a {
+  color: #0b6e4f;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.nav a:hover {
+  text-decoration-thickness: 2px;
+}
+
+.copyRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.copyValue {
+  flex: 1 1 12rem;
+  min-width: 0;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.85rem;
+  word-break: break-all;
+  padding: 0.55rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+}
+
+.instructions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-left: 1.25rem;
+  line-height: 1.5;
+}
+
+.instructions li {
+  color: var(--muted);
+}
+
+.warning {
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  border: 1px solid #e8c547;
+  background: #fffbe8;
+  color: #6b5a00;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+}
+
+.statusBadge.active {
+  color: #0b6e4f;
+  border-color: #b8dfd0;
+  background: #edf8f2;
+}
+
+.statusBadge.paused {
+  color: #8a6a00;
+  border-color: #e8d9a8;
+  background: #fff9e6;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 650;
+}
+
+.dangerZone {
+  border-color: #e8b4b4;
+}
+
+.manageLink {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.55rem 0.95rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.manageLink:hover {
+  border-color: #0b6e4f;
+}
+
+@media (prefers-color-scheme: dark) {
+  .brand,
+  .nav a {
+    color: #5dcea6;
+  }
+
+  .lede {
+    color: #aab;
+  }
+
+  .warning {
+    background: #2a2610;
+    border-color: #5a4f1a;
+    color: #e8d98a;
+  }
+
+  .statusBadge.active {
+    color: #5dcea6;
+    border-color: #2d5a47;
+    background: #142820;
+  }
+
+  .statusBadge.paused {
+    color: #e8c547;
+    border-color: #4a4018;
+    background: #221e0f;
+  }
+
+  .dangerZone {
+    border-color: #5a3030;
+  }
+
+  .manageLink:hover {
+    border-color: #5dcea6;
+  }
+}

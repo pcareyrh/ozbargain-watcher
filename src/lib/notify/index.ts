@@ -1,14 +1,19 @@
-import { ConsoleNotifier } from "./console";
-import type { Notifier } from "./types";
+import { ConsoleNotifier } from "./console"
+import { NtfyNotifier } from "./ntfy"
+import type { Notifier } from "./types"
 
 export function createNotifier(kind = process.env.NOTIFIER ?? "console"): Notifier {
   switch (kind) {
     case "console":
-      return new ConsoleNotifier();
+      return new ConsoleNotifier()
+    case "ntfy":
+      return new NtfyNotifier()
     default:
-      console.warn(`[ozbargain-watcher] Unknown NOTIFIER="${kind}", using console`);
-      return new ConsoleNotifier();
+      console.warn(`[ozbargain-watcher] Unknown NOTIFIER="${kind}", using console`)
+      return new ConsoleNotifier()
   }
 }
 
-export type { DealAlert, Notifier } from "./types";
+export { ConsoleNotifier } from "./console"
+export { NtfyNotifier, sendNtfyMessage, sendNtfyTestMessage } from "./ntfy"
+export type { DealAlert, Notifier, NtfyTarget } from "./types"

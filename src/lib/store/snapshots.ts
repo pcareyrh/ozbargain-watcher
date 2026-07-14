@@ -30,6 +30,7 @@ export type StoredAlert = {
   windowMinutes: number;
   votesPos: number;
   alertedAt: number;
+  subscriptionId?: string;
 };
 
 const DEAL_TTL_SECONDS = 48 * 60 * 60;
@@ -50,8 +51,9 @@ function dealKey(id: string): string {
   return `deal:${id}`;
 }
 
-function alertedKey(id: string): string {
-  return `alerted:${id}`;
+function alertedKey(dealId: string, subId?: string): string {
+  if (subId) return `alerted:${subId}:${dealId}`;
+  return `alerted:${dealId}`;
 }
 
 function trimHistory(
@@ -155,22 +157,54 @@ export async function upsertDealHistory(
   return snapshot;
 }
 
+async function getAlertedAt(
+  dealId: string,
+  subId?: string,
+): Promise<number | null> {
+  const redis = getRedis();
+  const key = alertedKey(dealId, subId);
+
+  if (!redis) {
+    return memory.alerted.get(key) ?? null;
+  }
+
+  return (await redis.get<number>(key)) ?? null;
+}
+
+async function setAlertedAt(
+  dealId: string,
+  cooldownHours: number,
+  now: number,
+  subId?: string,
+): Promise<void> {
+  const redis = getRedis();
+  const key = alertedKey(dealId, subId);
+  const ttlSeconds = Math.ceil(cooldownHours * 60 * 60);
+
+  if (!redis) {
+    memory.alerted.set(key, now);
+    return;
+  }
+
+  await redis.set(key, now, { ex: ttlSeconds });
+}
+
+function isWithinCooldown(
+  alertedAt: number | null,
+  cooldownHours: number,
+  now: number,
+): boolean {
+  if (alertedAt === null) return false;
+  return now - alertedAt < cooldownHours * 60 * 60 * 1000;
+}
+
 export async function wasRecentlyAlerted(
   dealId: string,
   cooldownHours: number,
   now = Date.now(),
 ): Promise<boolean> {
-  const redis = getRedis();
-  let alertedAt: number | null = null;
-
-  if (!redis) {
-    alertedAt = memory.alerted.get(dealId) ?? null;
-  } else {
-    alertedAt = (await redis.get<number>(alertedKey(dealId))) ?? null;
-  }
-
-  if (alertedAt === null) return false;
-  return now - alertedAt < cooldownHours * 60 * 60 * 1000;
+  const alertedAt = await getAlertedAt(dealId);
+  return isWithinCooldown(alertedAt, cooldownHours, now);
 }
 
 export async function markAlerted(
@@ -178,15 +212,26 @@ export async function markAlerted(
   cooldownHours: number,
   now = Date.now(),
 ): Promise<void> {
-  const redis = getRedis();
-  const ttlSeconds = Math.ceil(cooldownHours * 60 * 60);
+  await setAlertedAt(dealId, cooldownHours, now);
+}
 
-  if (!redis) {
-    memory.alerted.set(dealId, now);
-    return;
-  }
+export async function wasRecentlyAlertedForSub(
+  subId: string,
+  dealId: string,
+  cooldownHours: number,
+  now = Date.now(),
+): Promise<boolean> {
+  const alertedAt = await getAlertedAt(dealId, subId);
+  return isWithinCooldown(alertedAt, cooldownHours, now);
+}
 
-  await redis.set(alertedKey(dealId), now, { ex: ttlSeconds });
+export async function markAlertedForSub(
+  subId: string,
+  dealId: string,
+  cooldownHours: number,
+  now = Date.now(),
+): Promise<void> {
+  await setAlertedAt(dealId, cooldownHours, now, subId);
 }
 
 export async function pushRecentAlert(alert: StoredAlert): Promise<void> {

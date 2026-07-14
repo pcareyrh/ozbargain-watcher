@@ -1,11 +1,13 @@
-import type { Deal } from "../ozbargain/types";
+import type { Deal } from "../ozbargain/types"
 
 export type DealAlert = {
-  deal: Deal;
-  deltaVotes: number;
-  windowMinutes: number;
-};
+  deal: Deal
+  deltaVotes: number
+  windowMinutes: number
+}
+
+export type NtfyTarget = { server: string; topic: string; token?: string }
 
 export interface Notifier {
-  notify(alert: DealAlert): Promise<void>;
+  notify(alert: DealAlert, target?: NtfyTarget): Promise<void>
 }

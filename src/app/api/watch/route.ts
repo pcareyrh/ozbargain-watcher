@@ -26,6 +26,7 @@ export async function GET(request: Request) {
       })),
       alerted: result.alerted.map((a) => a.deal.id),
       skippedCooldown: result.skippedCooldown,
+      subscriptionsNotified: result.subscriptionsNotified,
       config: result.config,
       ranAt: result.ranAt,
       backend: result.backend,

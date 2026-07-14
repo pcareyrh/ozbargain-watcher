@@ -33,6 +33,17 @@
   line-height: 1.5;
 }
 
+.lede a {
+  color: #0b6e4f;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.lede a:hover {
+  text-decoration-thickness: 2px;
+}
+
 .meta {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -88,6 +99,10 @@
   .lede,
   .label {
     color: #aab;
+  }
+
+  .lede a {
+    color: #5dcea6;
   }
 
   .meta > div {
